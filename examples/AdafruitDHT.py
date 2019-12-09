@@ -23,7 +23,8 @@ import sys
 import time
 import Adafruit_DHT
 import socket
-from flask import Flask
+import requests
+
 
 # Parse command line parameters.
 sensor_args = { '11': Adafruit_DHT.DHT11,
@@ -41,36 +42,34 @@ else:
 # to 15 times to get a sensor reading (waiting 2 seconds between each retry).
 
 
-host = '10.148.128.145'
-port = 12345                  # The same port as used by the server
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect((host, port))
+#host = '10.148.131.196'
+#port = 12345                  # The same port as used by the server
+#s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#s.connect((host, port))
 
-app = Flask(__name__)
-@app.route("/")
-def refresh():
-	return "ABC"
-
-if __name__ == "__main__":
-	app.run()
 
 while (True):
+#	if s1.inWaitin() > 0:
+#		inputValue = s1.read(1)
+#		s.sendall(inputValue)
 	humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
 
 # Un-comment the line below to convert the temperature to Fahrenheit.
-	temperature = temperature * 9/5.0 + 32
+	#temperature = temperature * 9/5.0 + 32
 
 # Note that sometimes you won't get a reading and
 # the results will be null (because Linux can't
 # guarantee the timing of calls to read the sensor).
 # If this happens try again!
 	if humidity is not None and temperature is not None:
-        	 s.sendall(b'Sensor1: Temp={0:0.1f}*  Humidity={1:0.1f}%'.format(temperature, humidity))
+        	 #s.sendall(b'Sensor2: Temp={0:0.1f}*  Humidity={1:0.1f}%'.format(temperature, humidity))
+		 data = {'tem':temperature, 'hum':humidity}
+		 r = requests.put('http://192.168.1.69:5000/1', data=data)
 	   	 print('Temp={0:0.1f}*  Humidity={1:0.1f}%'.format(temperature, humidity))
 	else:
 		print('Failed to get reading. Try again!')
     		sys.exit(1)
 	time.sleep(1)
 #data = s.recv(1024)
-s.close()
-print('Received', repr(data))
+#s.close()
+#print('Received', repr(data))
